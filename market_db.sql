@@ -148,3 +148,96 @@ select mem_id, avg(amount) '평균 구매 개수'
     
 -- group by절 (count)
 select count(*) from member;
+select count(phone1) '연락처가 있는 회원' from member;
+
+-- group by절 (having)
+select mem_id '회원 아이디', sum(price*amount) '총 구매 금액'
+	from buy
+    group by mem_id;
+    
+select mem_id '회원 아이디', sum(price*amount)'총 구매 금액'
+	from buy
+    group by mem_id
+    having sum(price*amount) > 1000;
+    
+select mem_id '회원 아이디', sum(price*amount)'총 구매 금액'
+	from buy
+    group by mem_id
+    having sum(price*amount) > 1000
+    order by sum(price*amount) desc;
+
+
+-- Insert문
+
+create table hongong1 (toy_id int, toy_name varchar(4), age int);
+insert into hongong1 values(1,'우디',25);
+select * from hongong1;
+insert into hongong1(toy_id, toy_name) values(2,'버즈');
+insert into hongong1(toy_name,age,toy_id) values ('제시',20,3);
+
+
+-- Insert문 auto_increment
+create table hongong2(
+	toy_id int auto_increment primary key,
+    toy_name char(4),
+    age int);
+
+insert into hongong2 values (null, '보핍',25); -- 차례대로 toy_id, toy_name, age의 값을 집어넣는데 toy_id의 경우 
+insert into hongong2 values (null, '슬링키',22); -- auto_increment로 값이 알아서 증가하기 때문에 null을 insert하더라도 오류가 발생하지 않는다
+insert into hongong2 values (null, '렉스',21); -- 만약 auto_increment 속성이 없는 행에 null을 넣으면 에러가 발생 할 것이다
+select * from hongong2;
+
+select last_insert_id(); -- 마지막 id의 번호를 알려준다
+
+alter table hongong2 auto_increment=100; -- 테이블의 auto_increment 시작 번호를 100으로 설정
+insert into hongong2 values(null, '재남',35); -- 테이블에 값 넣기
+select * from hongong2;
+
+create table hongong3( -- 새로운 테이블 생성
+	toy_id int auto_increment primary key,
+	toy_name varchar(4),
+    age int
+);
+alter table hongong3 auto_increment=1000; -- 테이블의 auto_increment 값을 1000으로 설정
+set @@auto_increment_increment=3; -- auto_increment의 증가 값이 3씩 증가하도록 설정
+select * from hongong3;
+
+
+show global variables;
+
+Use world;
+select count(*) from city;
+select * from city limit 5;
+
+create table city_popul
+(
+	city_name varchar(35),
+    population int
+);
+
+insert into city_popul select Name, population from city;
+select * from city_popul;
+
+
+
+
+-- Update문
+
+update city_popul
+	set city_name = '서울'
+    where city_name = 'seoul';
+Select * from city_popul where city_name = '서울';
+
+
+update city_popul
+	set city_name = '뉴욕', population = 0
+    where city_name = 'New York';
+select * from city_popul where city_name = '뉴욕';
+
+update city_popul
+	set city_name = '서울';
+
+
+update city_popul
+	set population = population / 10000;
+select * from city_popul order by population desc limit 15;
