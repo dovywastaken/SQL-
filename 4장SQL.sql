@@ -51,3 +51,158 @@ select cast('2022/12/12' as date);
 select cast('2022^12^12' as date);
 select cast('2022@12@12' as date);
 
+select num, concat(cast(price as char), 'x', cast(amount as char), '=')
+	'가격X수량', price*amount '구매액'
+from buy;
+
+-- implicit casting
+select '100' + '200';
+select concat('100', '200');
+select concat(100, '200');
+select 100+'200';
+
+-- Inner join
+
+select *
+	from buy
+	inner join member
+    on buy.mem_id = member.mem_id
+where buy.mem_id = 'GRL';
+
+select *
+	from buy
+	inner join member
+    on buy.mem_id = member.mem_id;
+    
+select *
+	from buy
+    inner join member
+    on buy.mem_id = member.mem_id;
+
+
+select mem_id, mem_name, prod_name, addr, concat(phone1, phone2)'연락처'
+	from buy
+		inner join member
+        on buy.mem_id = member.mem_id;
+        
+
+select buy.mem_id, mem_name, prod_name, addr, concat(phone1, phone2)'연락처'
+	from buy
+		inner join member
+        on buy.mem_id = member.mem_id;
+        
+select buy.mem_id, member.mem_name, buy.prod_name, member.addr, concat(member.phone1, member.phone2) '연락처'
+	from buy
+		inner join member
+        on buy.mem_id = member.mem_id;
+
+
+select B.mem_id, M.mem_name, B.prod_name, M.addr, concat(M.phone1, M.phone2) '연락처'
+	from buy B
+		inner join member M
+        on B.mem_id = M.mem_id;
+        
+select B.mem_id, M.mem_name, B.prod_name, M.addr
+	from buy B
+		inner join member M
+        on B.mem_id = M.mem_id
+	order by M.mem_id;
+        
+-- Outer Join
+
+select M.mem_id, M.mem_name, B.prod_name, M.addr 
+	from member M
+		left outer join buy B
+        on B.mem_id = M.mem_id
+	order by M.mem_id;
+    
+    
+select *
+	from member M
+		inner join buy B
+        on B.mem_id = M.mem_id
+	order by M.mem_id;
+    
+select *
+	from member M
+		left outer join buy B
+        on B.mem_id = M.mem_id
+	order by M.mem_id;
+    
+    
+-- self join
+create table emp_table (emp char(4), manager char(4), phone varchar(8));
+
+insert into emp_table values('대표', null, '0000');
+insert into emp_table values('영업이사', '대표', '1111');
+insert into emp_table values('관리이사', '대표', '2222');
+insert into emp_table values('정보이사', '대표', '3333');
+insert into emp_table values('영업과장', '영업이사', '1111-1');
+insert into emp_table values('경리부장', '관리이사', '2222-1');
+insert into emp_table values('인사부장', '관리이사', '2222-2');
+insert into emp_table values('개발팀장', '정보이사', '3333-1');
+insert into emp_table values('개발주임', '정보이사', '3333-1-1');
+
+select * from emp_table;
+
+select A.emp '직원', B.emp '직속상관', B.phone '직속상관연락처'
+	from emp_table A
+		inner join emp_table B
+        on A.manager = B.emp
+	where A.emp = '경리부장';
+    
+-- SQL 프로그래밍 if문 활용
+
+DELIMITER $$
+create procedure ifProc3()
+begin
+	declare debutDate date;
+    declare curDate date;
+    declare days int;
+	select debut_date into debutDate
+		from market_db.member
+        where mem_id = 'APN';
+	set curDate = current_date();
+    set days = datediff(curDate, debutDate);
+    
+    if(days/365) >= 5 then
+		select concat('데뷔한 지', days, '일이나 지났습니다.');
+	else
+		select '데뷔한 지' + days + '일밖에 안됐네요';
+	end if;
+end%%
+DELIMITER ;
+call ifProc3();
+
+
+select M.mem_id, M.mem_name, sum(price*amount) '총구매액'
+	from buy B
+		right Outer join member M
+        on B.mem_id = M.mem_id
+    group by M.mem_id
+    order by sum(price*amount) desc;
+    
+    
+SELECT M.mem_id,  M.mem_name, SUM(price * amount) '총구매액',
+    CASE
+        WHEN SUM(price * amount) >= 1500 THEN '최우수고객'
+        WHEN SUM(price * amount) >= 1000 THEN '우수고객'
+        WHEN SUM(price * amount) >= 1 THEN '일반고객'
+        ELSE '유령고객'
+    END '회원등급'
+FROM 
+    buy B
+    RIGHT OUTER JOIN member M ON B.mem_id = M.mem_id
+GROUP BY 
+    M.mem_id, M.mem_name
+ORDER BY 
+    SUM(price * amount) DESC;
+
+    
+    
+    
+    
+    
+    
+    
+    
