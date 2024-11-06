@@ -241,3 +241,18 @@ update city_popul
 update city_popul
 	set population = population / 10000;
 select * from city_popul order by population desc limit 15;
+
+
+
+-- delete문
+delete from city_popul
+	where city_name like 'new%';
+    
+    
+delete from city_popul
+	where city_name like 'New%'
+    limit 5;
+    
+
+
+    
