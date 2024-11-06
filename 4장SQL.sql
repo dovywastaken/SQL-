@@ -190,19 +190,74 @@ SELECT M.mem_id,  M.mem_name, SUM(price * amount) '총구매액',
         WHEN SUM(price * amount) >= 1 THEN '일반고객'
         ELSE '유령고객'
     END '회원등급'
-FROM 
-    buy B
-    RIGHT OUTER JOIN member M ON B.mem_id = M.mem_id
+FROM  buy B
+    RIGHT OUTER JOIN member M 
+    ON B.mem_id = M.mem_id
 GROUP BY 
-    M.mem_id, M.mem_name
-ORDER BY 
-    SUM(price * amount) DESC;
+    M.mem_id
+ORDER BY SUM(price * amount) DESC;
 
     
+-- while문
+
+drop procedure if exists whileProc;
+
+delimiter %%
+create procedure whileProc()
+begin
+	declare i int;
+    declare hap int;
+    set i = 1;
+    set hap = 0;
     
+    while(i <= 100) do
+		set hap = hap + i;
+        set i = i+1;
+	end while;
+    select '1부터 100까지의 합 ==>', hap;
+end %%;
+delimiter ;
+call whileProc();
     
+delimiter %%
+create procedure whileProc2()
+begin
+	declare i int;
+    declare hap int;
+    set i = 1;
+    set hap = 0;
     
+    myWhile:
+	while(i<=100) do
+		if(i%4 = 0)then
+			set i = i+1;
+			iterate myWhile;
+        end if;
+        set hap = hap + i;
+        if(hap > 1000)then
+			leave myWhile;
+		end if;
+        set i =i+1;
+	end while;
+    select '1부터 100까지의 합(4의 배수 제외), 1000을 넘으면 종료 ==>',hap;
+end%% ;
+delimiter ;
+call whileProc2();
     
-    
-    
-    
+
+-- 동적 SQL
+
+prepare myQuery from 'select * from member where mem_id = "BLK"';
+execute myQuery;
+deallocate prepare myQuery;
+
+
+
+create table gate_table(id int auto_increment primary key, entry_time datetime);
+set @curDate = current_timestamp();
+prepare myQuery from 'insert into gate_table values(null, ?)';
+execute myQuery Using @curDate;
+deallocate prepare myQuery;
+
+select * from gate_table;
+
