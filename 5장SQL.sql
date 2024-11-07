@@ -166,6 +166,110 @@ create table member(
     phone1 char(3)
 );
 
+describe member;
+alter table member
+	alter column  phone1 set default '02';
+
+insert into member values('RED','레드벨벳','161','054');
+insert into member values('SPC','우주소녀',default,default);
+select * from member;
+
+
+-- 가상의 테이블 : 뷰
+
+-- market_db에서 실습
+use market_db;
+create view v_member
+as
+	select mem_id, mem_name, addr From member;
+
+select * from v_member; -- 원래 테이블(member)에서 select 한 컬럼만 뷰로 구현되기 때문에 *로 전체 조회해도 불러온 컬럼만 나온다
+
+select mem_name, addr from v_member
+	where addr in('서울','경기');
+    
+select B.mem_id, M.mem_name, B.prod_name, M.addr, concat(M.phone1, M.phone2) '연락처' 
+	From buy B
+		Inner join member M
+        On B.mem_id = M.mem_id;
+
+
+Create view v_memberbuy
+as
+	select B.mem_id, M.mem_name, B.prod_name, M.addr, concat(M.phone1, M.phone2) '연락처'
+	From buy B
+		Inner join member M
+        On B.mem_id = M.mem_id
+;
+
+drop view v_memberbuy;
+select * from v_memberbuy where mem_name = '블랙핑크';
+
+
+create view v_viewtest1
+as
+	select B.mem_id 'Member ID', M.mem_name As 'Member Name',
+		B.prod_name "Product Name",
+					concat(M.phone1, M.phone2) as "Office Phone"
+		from buy B
+			Inner join member M
+            on B.mem_id = M.mem_id
+;
+
+select distinct `Member ID`, `Member Name` From v_viewtest1;
+            
+Alter view v_viewtest1
+as
+	select B.mem_id '회원 ID', M.mem_name As '회원 이름',
+		B.prod_name "제품 이름",
+					concat(M.phone1, M.phone2) as "연락처"
+		from buy B
+			Inner join member M
+            on B.mem_id = M.mem_id
+;
+
+select distinct `회원 ID`, `회원 이름` From v_viewtest1;
+
+drop view v_viewtest1;
+
+
+update v_member set addr = '창원' where mem_id='BLK';
+
+select addr, mem_id from v_member;
+insert into v_member(mem_id, mem_name, addr) values('BTS','방탄소년단','경기');
+
+create view v_height167
+as
+	select * from member where height >= 167
+				with check option;
+
+select * from v_height167;
+
+delete from v_height167 where height < 167; -- 뷰로 만든 167 미만인 데이터가 없기 때문에 삭제될 데이터도 없다
+
+-- 뷰를 통한 데이터 입력
+insert into v_height167 values('TRA','티아라',6,'서울',null,null,159,'2005-01-01'); -- 일부러 키가 167보다 작도록 설정한 데이터를 insert 해보기
+insert into v_height167 values('TOB', '텔레토비',4,'영국',null,null,140,'1995-01-01'); -- with check option 속성 때문에  insert가 안된다
+select * from member;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
