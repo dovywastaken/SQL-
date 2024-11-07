@@ -10,10 +10,11 @@ create table member(
      phone varchar(8),
      height int,
      debut date
+     -- primary key(id) 이런식으로 PK 처리를 해도 된다
 );
 
 create table buy(
-	num char(5) not null auto_increment primary key,
+	num int not null auto_increment primary key,
     id varchar(5) not null,
     product char(5) not null,
     category char (5),
@@ -22,6 +23,8 @@ create table buy(
     FOREIGN KEY (id) REFERENCES member(id) -- FK 처리
 );
 
+select * from member;
+select * from buy;
 
 INSERT INTO member VALUES('TWC', '트와이스', 9, '서울', '02', '11111111', 167, '2015.10.19');
 INSERT INTO member VALUES('BLK', '블랙핑크', 4, '경남', '055', '22222222', 163, '2016.08.08');
@@ -46,3 +49,123 @@ INSERT INTO buy VALUES(NULL, 'APN', '청바지', '패션', 50, 1);
 INSERT INTO buy VALUES(NULL, 'MMU', '지갑', NULL, 30, 1);
 INSERT INTO buy VALUES(NULL, 'APN', '혼공SQL', '서적', 15, 1);
 INSERT INTO buy VALUES(NULL, 'MMU', '지갑', NULL, 30, 4);
+
+
+
+
+
+-- constraint
+
+drop table if exists buy, member;
+create table member(
+	mem_id char(8) not null,
+    mem_name char(8) not null,
+    height int unsigned null,
+    constraint primary key PKMember (mem_id)
+);
+alter table member
+	add constraint
+    primary key (mem_id);
+
+describe member;
+describe buy;
+
+create table member(
+	mem_id char(8) primary key,
+    mem_name char(8) not null,
+    height int unsigned null
+);
+create table buy(
+	num int auto_increment primary key,
+    mem_id char(8) not null,
+    prod_name char(6) not null,
+    foreign key(mem_id) references member(mem_id)
+);
+
+
+
+
+drop table if exists buy;
+create table buy(
+	num int auto_increment primary key,
+    mem_id char(8) not null,
+    prod_name char(8) not null
+);
+alter table buy
+	add constraint
+    foreign key(mem_id)
+    references member(mem_id);
+
+describe buy;
+select M.mem_id, M.mem_name, B.prod_name from buy B
+	Inner join member M
+    on B.mem_id = M.mem_id
+;
+
+select * from member;
+select * from buy;
+
+insert into member values('BLK', '블랙핑크', 163);
+insert into buy values(null, 'BLK', '지갑');
+insert into buy values(null, 'BLK', 'MacBook');
+
+update member Set mem_id = 'Pink' where mem_id = 'BLK'; -- 에러발생 : PK와 FK로 연결된 경우 수정이 불가능하기 때문에
+delete from member where mem_id='BLK'; -- 에러발생 : 마찬가지로 BLK는 PK와 FK로 연결되었기 때문에 수정이 불가능함
+
+-- 
+alter table buy
+	add constraint
+    foreign key(mem_id)
+    references member(mem_id)
+    on update cascade
+    on delete cascade;
+
+delete from member where mem_id='Pink';
+
+
+
+
+drop table if exists buy, member;
+create table member(
+	mem_id char(8) primary key,
+    mem_name char(10) not null,
+    height int unsigned null,
+    email char(30) null unique
+);
+
+insert into member values('BLK', '블랙핑크', 163, 'pink@gmail.com');
+insert into member values('TWC', '트와이스', 167, null);
+insert into member values('APN', '에이핑크', 164, 'pink@gmail.com'); -- 이메일은 Unique 처리를 해놔서 같은 이메일로 등록이 안된다
+
+
+drop table if exists member;
+create table member(
+	mem_id char(8) primary key,
+    mem_name char(10) not null,
+    height int unsigned null check (height>=100),
+    phone1 char(3) null
+);
+
+insert into member values('BLK', '블랙핑크', 163, null);
+insert into member values('APN', '에이핑크', 99, null); -- height의 값이 check constraint에 의해 100이하면 insert 되지 않기 때문에 에러가 발생한다
+
+alter table member
+	add constraint
+    check(phone1 in ('02', '031', '032', '054','055','061'));
+    
+    
+insert into member values('TWC', '트와이스', 167, '02');
+insert into member values('OMY', '오마이걸', 167, '010'); -- 010은 check 제약조건에서 설정하지 않았기 때문에 insert가 안된다
+
+-- 기본값 정의
+drop table if exists member;
+create table member(
+	mem_id char(8) primary key,
+    mem_name varchar(10) not null,
+    height int unsigned null default 160,
+    phone1 char(3)
+);
+
+
+
+
