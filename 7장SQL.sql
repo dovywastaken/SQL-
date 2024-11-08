@@ -105,3 +105,45 @@ delimiter ^^
 delimiter ;
 
 call dynamic_proc('member');
+
+-- stored function
+
+set global log_bin_trust_function_creators = 1;
+
+use market_db;
+drop function if exists sumFunc;
+delimiter ^^
+	create function sumFunc(number1 int, number2 int) -- 파라미터로는 이걸 받아라!!
+		returns int -- 반환 형식. 즉 정수 값을 반환하도록 함
+	begin
+		return number1 + number2; -- 실제 반환 값
+	end ^^;
+delimiter ;
+    
+select sumFunc(100, 200) as '합계';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
