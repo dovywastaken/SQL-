@@ -44,6 +44,16 @@ create index idx_member_addr
 analyze table member;
 show table status like 'member';
 
+create unique index idx_member_mem_number
+	on member(mem_number);
+
+create unique index idx_member_mem_name
+	on member(mem_name);
+
+show index from member;
+
+insert into member values('MOO','마마무',2,'태국','001','12341234',155,'2020.10.10'); 
+
 
 
 
